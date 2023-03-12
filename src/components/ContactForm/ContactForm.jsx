@@ -14,12 +14,13 @@ export default class ContactForm extends Component {
         e.preventDefault();
 
         const contact = {
-            name: this.state.name,
-            number: this.state.number,
+            name: this.state.name.trim(),
+            number: this.state.number.trim(),
             id: `id-${nanoid()}`
         }
-
-        this.props.addContact(contact);
+        if (!this.props.addContact(contact)) {
+            return alert(`${contact.name} is already in contacts`)
+        }
 
         this.setState({
             name: '',
@@ -28,6 +29,7 @@ export default class ContactForm extends Component {
     }
 
     render() {
+        const {number, name} = this.state;
         return (
             <div>
                 <form action="" className={css.form} onSubmit={this.onSubmit}>
@@ -38,7 +40,7 @@ export default class ContactForm extends Component {
                         name="name"
                         pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
                         title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-                        value={this.state.name}
+                        value={name}
                         onChange={(e) => this.setState((state) => ({ ...state, name: e.target.value }))}
                         required
                     />
@@ -49,7 +51,7 @@ export default class ContactForm extends Component {
                         name="number"
                         pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
                         title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-                        value={this.state.number}
+                        value={number}
                         onChange={(e) => this.setState((state) => ({ ...state, number: e.target.value }))}
                         required
                     />

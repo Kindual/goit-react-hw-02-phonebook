@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import ContactForm from './ContactForm/ContactForm'
+import Contacts from './Contacts/Contacts';
+import Filter from './Filter/Filter';
 import Section from './Section/Section'
 
 export default class App extends Component {
@@ -14,12 +16,32 @@ export default class App extends Component {
   }
 
   addContact = (obj) => {
+    if (this.state.contacts.findIndex(contact => contact.name.trim().toLowerCase() === obj.name.trim().toLowerCase()) >= 0) {
+      return false
+    }
+
     this.setState((state) =>
       ({ ...state, contacts: [...state.contacts, obj] })
     );
+    return true
   };
 
+  deleteContact = (id) => {
+    this.setState((state) =>
+    ({
+      ...state, contacts: state.contacts.filter(contact =>
+        contact.id !== id)
+    }))
+  }
+
+  updateFilterState = (filter) => {
+    this.setState(state => ({ ...state, filter }))
+  }
+
   render() {
+    const { filter, contacts, } = this.state;
+    const filtered = filter.trim() ? contacts.filter(contact => contact.name.toLowerCase().includes(filter.trim().toLowerCase())) : contacts;
+
     return (
       <div>
         <Section>
@@ -29,13 +51,8 @@ export default class App extends Component {
 
         <Section>
           <h2>Contacts</h2>
-          <ul>
-            {this.state.contacts.map(contact => 
-              <li key={contact.id}>
-                <p>{contact.name}: {contact.number}</p>
-              </li>
-            )}
-          </ul>
+          <Filter updateFilterState={this.updateFilterState} filter={filter} />
+          <Contacts contacts={filtered} deleteContact={this.deleteContact} />
         </Section>
       </div>
     )
